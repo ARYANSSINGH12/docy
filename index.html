@@ -6,7 +6,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>DocView - Contract Extractor</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<!-- Primary CDN -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
+<!-- Fallback CDN if primary is blocked -->
+<script>
+if (typeof mammoth === 'undefined') {
+document.write('<script src="https://cdn.jsdelivr.net/npm/mammoth@1.6.0/mammoth.browser.min.js"><\/script>');
+}
+</script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#f5f6fb;--card:#fff;--ink:#1d1f27;--muted:#6f7484;--line:#e5e8f0;--accent:#2950ff;--accentSoft:#eef2ff;--good:#138f55;--goodSoft:#edf8f1;--warn:#d94f28;--warnSoft:#fff3ef;--shadow:0 10px 30px rgba(18,25,38,.08)}
@@ -88,6 +95,8 @@ main{flex:1;overflow:auto;position:relative}
 .progress{width:220px;height:4px;border-radius:999px;background:var(--line);margin:12px auto 0;overflow:hidden}
 .progress::after{content:"";display:block;width:40%;height:100%;background:var(--accent);animation:progress 1.4s ease-in-out infinite}
 .privacy{padding:10px 24px;background:var(--goodSoft);border-top:1px solid #c5e7d4;color:var(--good);font-size:.74rem;font-weight:500}
+#mammothError{display:none;padding:12px 24px;background:#fff0ed;border-bottom:2px solid var(--warn);color:var(--warn);font-size:.82rem;font-weight:600;text-align:center}
+.upload-error{padding:16px 20px;border:1px solid #ffd0c4;background:#fff5f2;border-radius:12px;color:var(--warn);font-size:.85rem;line-height:1.6}
 .toast,.scroll-top{position:fixed;right:18px;box-shadow:var(--shadow);z-index:20}
 .toast{bottom:18px;background:#161821;color:#fff;padding:12px 16px;border-radius:12px;font-size:.83rem;transform:translateY(120%);opacity:0;transition:.25s}
 .toast.show{transform:translateY(0);opacity:1}
@@ -100,33 +109,34 @@ main{flex:1;overflow:auto;position:relative}
 </head>
 <body>
 <header>
-  <div class="logo"><div class="logo-mark">DOC</div>DocView</div>
-  <div class="meta">100% Client-Side | No Storage | No AI</div>
+<div class="logo"><div class="logo-mark">DOC</div>DocView</div>
+<div class="meta">100% Client-Side | No Storage | No AI</div>
 </header>
 <div class="app">
-  <aside>
-    <div class="aside-title">Loaded Documents</div>
-    <div class="file-list" id="fileList">
-      <div class="empty-side" id="sidebarEmpty">No documents yet.<br>Upload <strong>.docx</strong> files to begin.</div>
-    </div>
-  </aside>
-  <main id="main">
-    <div class="drop-zone" id="dropZone">
-      <input type="file" id="fileInput" accept=".docx" multiple>
-      <div class="drop-icon">DOCX</div>
-      <div class="drop-title">Drop your contracts here</div>
-      <div class="drop-sub">Supports <strong>.docx</strong> files, including large contracts. All processing happens in your browser.</div>
-      <div class="drop-badge">Secure - nothing leaves your device</div>
-    </div>
-    <div class="viewer" id="viewer"></div>
-    <div class="state-wrap" id="emptyState">
-      <div class="state">
-        <div class="state-title">Select a document</div>
-        <div>Upload files above, then pick one from the sidebar to view either the full document or the filtered summary.</div>
-      </div>
-    </div>
-  </main>
+<aside>
+<div class="aside-title">Loaded Documents</div>
+<div class="file-list" id="fileList">
+<div class="empty-side" id="sidebarEmpty">No documents yet.<br>Upload <strong>.docx</strong> files to begin.</div>
 </div>
+</aside>
+<main id="main">
+<div class="drop-zone" id="dropZone">
+<input type="file" id="fileInput" accept=".docx" multiple>
+<div class="drop-icon">DOCX</div>
+<div class="drop-title">Drop your contracts here</div>
+<div class="drop-sub">Supports <strong>.docx</strong> files, including large contracts. All processing happens in your browser.</div>
+<div class="drop-badge">Secure - nothing leaves your device</div>
+</div>
+<div class="viewer" id="viewer"></div>
+<div class="state-wrap" id="emptyState">
+<div class="state">
+<div class="state-title">Select a document</div>
+<div>Upload files above, then pick one from the sidebar to view either the full document or the filtered summary.</div>
+</div>
+</div>
+</main>
+</div>
+<div id="mammothError">⚠ Document parser failed to load (CDN may be blocked on this network). Try opening this file locally instead of from a URL, or check your internet/firewall settings.</div>
 <div class="privacy"><strong>Privacy guaranteed:</strong> all extraction runs entirely in the browser. No data is sent to a server or stored.</div>
 <button class="scroll-top" id="scrollTopBtn" type="button" aria-label="Scroll to top" title="Scroll to top">&uarr;</button>
 <div class="toast" id="toast"></div>
@@ -134,28 +144,28 @@ main{flex:1;overflow:auto;position:relative}
 <script>
 // ─── CATEGORIES ───────────────────────────────────────────────────────────────
 // FIX 1: Broadened regex patterns.
-//   Old pharma regex:  /\bpharmaceutical(?:\s+products?)?\b/
-//     → failed on "pharmaceuticals" because \b sits mid-word after "pharmaceutical"
-//   Old ortho regex:   /\borthop(?:a)?edic(?:\s+appliances?)?\b/
-//     → failed on "orthopaedics", "orthopedics", "orthopedic implants", etc.
-//   New regexes match any word that starts with the stem, covering all plurals/variants.
+// Old pharma regex: /\bpharmaceutical(?:\s+products?)?\b/
+// → failed on "pharmaceuticals" because \b sits mid-word after "pharmaceutical"
+// Old ortho regex: /\borthop(?:a)?edic(?:\s+appliances?)?\b/
+// → failed on "orthopaedics", "orthopedics", "orthopedic implants", etc.
+// New regexes match any word that starts with the stem, covering all plurals/variants.
 const CATEGORIES = [
-  {
-    key: 'pharma',
-    title: 'Pharmaceutical Products',
-    subtitle: 'Only passages or table rows mentioning pharmaceutical products are shown here.',
-    // Matches: pharmaceutical, pharmaceuticals, pharmaceutical product/products,
-    //          pharmacy, pharmacies, pharma (as a standalone word)
-    match: t => /\bpharmaceutical|\bpharmac(?:y|ies)\b/i.test(t)
-  },
-  {
-    key: 'ortho',
-    title: 'Orthopedic Appliance',
-    subtitle: 'Only passages or table rows mentioning orthopedic appliances are shown here.',
-    // Matches: orthopedic, orthopaedic, orthopedics, orthopaedics,
-    //          orthopedic appliance/implant/prosthesis and all British spellings
-    match: t => /\borthop(?:a)?edic/i.test(t)
-  }
+{
+key: 'pharma',
+title: 'Pharmaceutical Products',
+subtitle: 'Only passages or table rows mentioning pharmaceutical products are shown here.',
+// Matches: pharmaceutical, pharmaceuticals, pharmaceutical product/products,
+// pharmacy, pharmacies, pharma (as a standalone word)
+match: t => /\bpharmaceutical|\bpharmac(?:y|ies)\b/i.test(t)
+},
+{
+key: 'ortho',
+title: 'Orthopedic Appliance',
+subtitle: 'Only passages or table rows mentioning orthopedic appliances are shown here.',
+// Matches: orthopedic, orthopaedic, orthopedics, orthopaedics,
+// orthopedic appliance/implant/prosthesis and all British spellings
+match: t => /\borthop(?:a)?edic/i.test(t)
+}
 ];
 
 // ─── STATE ────────────────────────────────────────────────────────────────────
@@ -163,286 +173,305 @@ const docs = {};
 let activeId = null;
 let activeTab = 'document';
 
-const fileInput     = document.getElementById('fileInput');
-const dropZone      = document.getElementById('dropZone');
-const fileList      = document.getElementById('fileList');
-const sidebarEmpty  = document.getElementById('sidebarEmpty');
-const viewer        = document.getElementById('viewer');
-const emptyState    = document.getElementById('emptyState');
-const main          = document.getElementById('main');
-const scrollTopBtn  = document.getElementById('scrollTopBtn');
+const fileInput = document.getElementById('fileInput');
+const dropZone = document.getElementById('dropZone');
+const fileList = document.getElementById('fileList');
+const sidebarEmpty = document.getElementById('sidebarEmpty');
+const viewer = document.getElementById('viewer');
+const emptyState = document.getElementById('emptyState');
+const main = document.getElementById('main');
+const scrollTopBtn = document.getElementById('scrollTopBtn');
 
-dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragover'); });
-dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop',      e  => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles([...e.dataTransfer.files]); });
-fileInput.addEventListener('change',   ()  => { handleFiles([...fileInput.files]); fileInput.value = ''; });
-main.addEventListener('scroll',        ()  => scrollTopBtn.classList.toggle('show', main.scrollTop > 280));
-scrollTopBtn.addEventListener('click', ()  => main.scrollTo({ top: 0, behavior: 'smooth' }));
+dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles([...e.dataTransfer.files]); });
+fileInput.addEventListener('change', () => { handleFiles([...fileInput.files]); fileInput.value = ''; });
+main.addEventListener('scroll', () => scrollTopBtn.classList.toggle('show', main.scrollTop > 280));
+scrollTopBtn.addEventListener('click', () => main.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// ─── STARTUP CHECK ────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+if (typeof mammoth === 'undefined') {
+document.getElementById('mammothError').style.display = 'block';
+// Disable drop zone
+dropZone.style.opacity = '0.4';
+dropZone.style.pointerEvents = 'none';
+}
+});
 
 // ─── FILE HANDLING ────────────────────────────────────────────────────────────
 async function handleFiles(files) {
-  const docxFiles = files.filter(f => f.name.toLowerCase().endsWith('.docx'));
-  if (!docxFiles.length) { showToast('Only .docx files are supported'); return; }
-  for (const file of docxFiles) {
-    const id = 'doc_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
-    showLoading(id, file.name);
-    try {
-      const html = await extractDocx(file);
-      const wordCount = countWords(html);
-      const summary = buildSummary(html);
-      docs[id] = { name: file.name, size: file.size, html, wordCount, summaryHtml: summary.html, summaryMatches: summary.count };
-      addSidebarItem(id);
-      if (!activeId) switchDoc(id);
-    } catch (err) {
-      console.error(err);
-      removeLoading(id);
-      showToast('Failed to parse: ' + file.name);
-    }
-  }
+const docxFiles = files.filter(f => f.name.toLowerCase().endsWith('.docx'));
+if (!docxFiles.length) { showToast('Only .docx files are supported'); return; }
+for (const file of docxFiles) {
+const id = 'doc_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+showLoading(id, file.name);
+try {
+const html = await extractDocx(file);
+const wordCount = countWords(html);
+const summary = buildSummary(html);
+docs[id] = { name: file.name, size: file.size, html, wordCount, summaryHtml: summary.html, summaryMatches: summary.count };
+addSidebarItem(id);
+if (!activeId) switchDoc(id);
+} catch (err) {
+console.error(err);
+removeLoading(id);
+// Show a persistent error in the main area so it's not missed
+viewer.style.display = 'flex';
+emptyState.style.display = 'none';
+viewer.innerHTML = `<div class="upload-error">
+<strong>Failed to parse: ${esc(file.name)}</strong><br>
+${typeof mammoth === 'undefined'
+? 'The mammoth.js parser could not be loaded. Your network may be blocking the CDN. Try opening this HTML file directly (double-click it) instead of through a hosted URL.'
+: 'The file could not be read. Make sure it is a valid .docx file (not a .doc, PDF, or renamed file).'}
+</div>`;
+showToast('Failed to parse: ' + file.name);
+}
+}
 }
 
 function extractDocx(file) {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = e => {
-      mammoth.convertToHtml({ arrayBuffer: e.target.result }, {
-        styleMap: [
-          "p[style-name='Heading 1'] => h1:fresh",
-          "p[style-name='Heading 2'] => h2:fresh",
-          "p[style-name='Heading 3'] => h3:fresh",
-          "p[style-name='Title']     => h1:fresh",
-          "r[style-name='Strong']    => strong",
-          "r[style-name='Emphasis']  => em"
-        ]
-      }).then(r => resolve(postProcess(r.value))).catch(reject);
-    };
-    reader.onerror = reject;
-    reader.readAsArrayBuffer(file);
-  });
+return new Promise((resolve, reject) => {
+const reader = new FileReader();
+reader.onload = e => {
+mammoth.convertToHtml({ arrayBuffer: e.target.result }, {
+styleMap: [
+"p[style-name='Heading 1'] => h1:fresh",
+"p[style-name='Heading 2'] => h2:fresh",
+"p[style-name='Heading 3'] => h3:fresh",
+"p[style-name='Title'] => h1:fresh",
+"r[style-name='Strong'] => strong",
+"r[style-name='Emphasis'] => em"
+]
+}).then(r => resolve(postProcess(r.value))).catch(reject);
+};
+reader.onerror = reject;
+reader.readAsArrayBuffer(file);
+});
 }
 
 function postProcess(html) {
-  const doc  = new DOMParser().parseFromString('<div id="root">' + html + '</div>', 'text/html');
-  const root = doc.getElementById('root');
-  root.querySelectorAll('p,td').forEach(el => {
-    const text  = (el.textContent || '').trim();
-    const upper = text.toUpperCase();
-    if (/^(WARNING|CRITICAL|IMPORTANT|ALERT|⚠)/.test(upper) || text.startsWith('⚠'))
-      el.classList.add('callout-warn');
-    else if (/^(NOTE|REMINDER|PLEASE NOTE|✓)/.test(upper) || text.startsWith('✓'))
-      el.classList.add('callout-ok');
-    else if (/^(INFO|TIP)/.test(upper) || text.startsWith('📋') || text.startsWith('💡'))
-      el.classList.add('callout-info');
-  });
-  return root.innerHTML;
+const doc = new DOMParser().parseFromString('<div id="root">' + html + '</div>', 'text/html');
+const root = doc.getElementById('root');
+root.querySelectorAll('p,td').forEach(el => {
+const text = (el.textContent || '').trim();
+const upper = text.toUpperCase();
+if (/^(WARNING|CRITICAL|IMPORTANT|ALERT|⚠)/.test(upper) || text.startsWith('⚠'))
+el.classList.add('callout-warn');
+else if (/^(NOTE|REMINDER|PLEASE NOTE|✓)/.test(upper) || text.startsWith('✓'))
+el.classList.add('callout-ok');
+else if (/^(INFO|TIP)/.test(upper) || text.startsWith('📋') || text.startsWith('💡'))
+el.classList.add('callout-info');
+});
+return root.innerHTML;
 }
 
 // ─── SUMMARY BUILDER ─────────────────────────────────────────────────────────
 function buildSummary(html) {
-  const parsed = new DOMParser().parseFromString('<div id="root">' + html + '</div>', 'text/html');
-  const root   = parsed.getElementById('root');
-  const sections = CATEGORIES.map(category => ({ category, entries: collectEntries(root, category.match) }));
-  const count  = sections.reduce((sum, s) => sum + s.entries.length, 0);
-  if (!count) return {
-    count,
-    html: '<div class="summary-empty">No pharmaceutical products or orthopedic appliance references were found in this document.</div>'
-  };
-  return {
-    count,
-    html: `<div class="summary-layout">
-      <div class="summary-note">Summary view is filtered to just two tracked categories: pharmaceutical products and orthopedic appliance. The full document remains unchanged in the Document tab.</div>
-      ${sections.map(renderSummarySection).join('')}
-    </div>`
-  };
+const parsed = new DOMParser().parseFromString('<div id="root">' + html + '</div>', 'text/html');
+const root = parsed.getElementById('root');
+const sections = CATEGORIES.map(category => ({ category, entries: collectEntries(root, category.match) }));
+const count = sections.reduce((sum, s) => sum + s.entries.length, 0);
+if (!count) return {
+count,
+html: '<div class="summary-empty">No pharmaceutical products or orthopedic appliance references were found in this document.</div>'
+};
+return {
+count,
+html: `<div class="summary-layout">
+<div class="summary-note">Summary view is filtered to just two tracked categories: pharmaceutical products and orthopedic appliance. The full document remains unchanged in the Document tab.</div>
+${sections.map(renderSummarySection).join('')}
+</div>`
+};
 }
 
 // FIX 2: collectEntries now walks the FULL DOM tree recursively.
-//   Old code used [...root.children].forEach — only direct children.
-//   mammoth output is usually flat, but some styles/tables can produce nested
-//   divs or sections. Recursive walk ensures nothing is missed.
-//   Heading tracking (h1/h2/h3 trail) is preserved across the full traversal.
+// Old code used [...root.children].forEach — only direct children.
+// mammoth output is usually flat, but some styles/tables can produce nested
+// divs or sections. Recursive walk ensures nothing is missed.
+// Heading tracking (h1/h2/h3 trail) is preserved across the full traversal.
 function collectEntries(root, match) {
-  const entries = [];
-  const trail   = { h1: '', h2: '', h3: '' };
+const entries = [];
+const trail = { h1: '', h2: '', h3: '' };
 
-  function walk(parent) {
-    [...parent.children].forEach(node => {
-      const tag = (node.tagName || '').toUpperCase();
+function walk(parent) {
+[...parent.children].forEach(node => {
+const tag = (node.tagName || '').toUpperCase();
 
-      // Update heading trail
-      if (tag === 'H1') { trail.h1 = node.textContent.trim(); trail.h2 = ''; trail.h3 = ''; return; }
-      if (tag === 'H2') { trail.h2 = node.textContent.trim(); trail.h3 = ''; return; }
-      if (tag === 'H3') { trail.h3 = node.textContent.trim(); return; }
+// Update heading trail
+if (tag === 'H1') { trail.h1 = node.textContent.trim(); trail.h2 = ''; trail.h3 = ''; return; }
+if (tag === 'H2') { trail.h2 = node.textContent.trim(); trail.h3 = ''; return; }
+if (tag === 'H3') { trail.h3 = node.textContent.trim(); return; }
 
-      // Try to extract a matching snippet from known block elements
-      if (['P', 'TABLE', 'UL', 'OL'].includes(tag)) {
-        const html = extractRelevantHtml(node, match);
-        if (html) {
-          entries.push({ context: [trail.h1, trail.h2, trail.h3].filter(Boolean).join(' / '), html });
-          return; // don't descend further into an already-matched node
-        }
-        return; // P/UL/OL with no match — skip, no children to recurse into usefully
-      }
+// Try to extract a matching snippet from known block elements
+if (['P', 'TABLE', 'UL', 'OL'].includes(tag)) {
+const html = extractRelevantHtml(node, match);
+if (html) {
+entries.push({ context: [trail.h1, trail.h2, trail.h3].filter(Boolean).join(' / '), html });
+return; // don't descend further into an already-matched node
+}
+return; // P/UL/OL with no match — skip, no children to recurse into usefully
+}
 
-      // For any other container (div, section, article, etc.) — recurse
-      if (node.children.length) walk(node);
-    });
-  }
+// For any other container (div, section, article, etc.) — recurse
+if (node.children.length) walk(node);
+});
+}
 
-  walk(root);
-  return entries;
+walk(root);
+return entries;
 }
 
 function extractRelevantHtml(node, match) {
-  const tag  = (node.tagName || '').toUpperCase();
-  const text = (node.textContent || '').trim();
-  if (tag === 'TABLE')          return filterTable(node, match);
-  if (tag === 'UL' || tag === 'OL') return filterList(node, match);
-  return text && match(text) ? node.outerHTML : '';
+const tag = (node.tagName || '').toUpperCase();
+const text = (node.textContent || '').trim();
+if (tag === 'TABLE') return filterTable(node, match);
+if (tag === 'UL' || tag === 'OL') return filterList(node, match);
+return text && match(text) ? node.outerHTML : '';
 }
 
 // FIX 3: filterTable — old code checked match() on the whole table AFTER row removal,
-//   which could return an empty header-only table if the header text happened to match.
-//   New code: track whether any actual data rows survived. Return '' if none did.
+// which could return an empty header-only table if the header text happened to match.
+// New code: track whether any actual data rows survived. Return '' if none did.
 function filterTable(table, match) {
-  const clone      = table.cloneNode(true);
-  const rows       = [...clone.querySelectorAll('tr')];
-  let dataRowKept  = false;
+const clone = table.cloneNode(true);
+const rows = [...clone.querySelectorAll('tr')];
+let dataRowKept = false;
 
-  rows.forEach((row, index) => {
-    // Treat row 0 with <th> cells as the header — always keep it
-    const isHeader = index === 0 && !!row.querySelector('th');
-    if (isHeader) return;
+rows.forEach((row, index) => {
+// Treat row 0 with <th> cells as the header — always keep it
+const isHeader = index === 0 && !!row.querySelector('th');
+if (isHeader) return;
 
-    if (match(row.textContent || '')) {
-      dataRowKept = true;  // this data row matched → keep it
-    } else {
-      row.remove();        // no match → remove it
-    }
-  });
+if (match(row.textContent || '')) {
+dataRowKept = true; // this data row matched → keep it
+} else {
+row.remove(); // no match → remove it
+}
+});
 
-  // Only return the table if at least one data row survived
-  return dataRowKept ? clone.outerHTML : '';
+// Only return the table if at least one data row survived
+return dataRowKept ? clone.outerHTML : '';
 }
 
 function filterList(list, match) {
-  const clone = list.cloneNode(true);
-  [...clone.children].forEach(li => { if (!match(li.textContent || '')) li.remove(); });
-  return clone.children.length ? clone.outerHTML : '';
+const clone = list.cloneNode(true);
+[...clone.children].forEach(li => { if (!match(li.textContent || '')) li.remove(); });
+return clone.children.length ? clone.outerHTML : '';
 }
 
 function renderSummarySection(section) {
-  const count = section.entries.length;
-  return `<section class="summary-section">
-    <div class="summary-head">
-      <div>
-        <div class="summary-title">${section.category.title}</div>
-        <div class="summary-sub">${section.category.subtitle}</div>
-      </div>
-      <div class="chip">${count} match${count === 1 ? '' : 'es'}</div>
-    </div>
-    <div class="summary-body">
-      ${count
-        ? section.entries.map(entry => `<div class="summary-entry">${entry.context ? `<div class="summary-context">${esc(entry.context)}</div>` : ''}${entry.html}</div>`).join('')
-        : '<div class="summary-empty">No matching references were found for this category.</div>'
-      }
-    </div>
-  </section>`;
+const count = section.entries.length;
+return `<section class="summary-section">
+<div class="summary-head">
+<div>
+<div class="summary-title">${section.category.title}</div>
+<div class="summary-sub">${section.category.subtitle}</div>
+</div>
+<div class="chip">${count} match${count === 1 ? '' : 'es'}</div>
+</div>
+<div class="summary-body">
+${count
+? section.entries.map(entry => `<div class="summary-entry">${entry.context ? `<div class="summary-context">${esc(entry.context)}</div>` : ''}${entry.html}</div>`).join('')
+: '<div class="summary-empty">No matching references were found for this category.</div>'
+}
+</div>
+</section>`;
 }
 
 // ─── UTILITIES ────────────────────────────────────────────────────────────────
 function countWords(html) {
-  const box = document.createElement('div');
-  box.innerHTML = html;
-  return (box.textContent || '').trim().split(/\s+/).filter(Boolean).length;
+const box = document.createElement('div');
+box.innerHTML = html;
+return (box.textContent || '').trim().split(/\s+/).filter(Boolean).length;
 }
 
 function addSidebarItem(id) {
-  const doc  = docs[id];
-  const item = document.createElement('div');
-  item.className = 'file-item';
-  item.id = 'sidebar_' + id;
-  item.innerHTML = `<div class="file-icon">${doc.name.split('.').pop().toUpperCase()}</div><div class="file-info"><div class="file-name" title="${esc(doc.name)}">${esc(doc.name)}</div><div class="file-size">${(doc.size / 1024).toFixed(1)} KB | ${doc.wordCount.toLocaleString()} words</div></div><button class="remove-btn" type="button" onclick="removeDoc('${id}',event)" title="Remove">✕</button>`;
-  item.addEventListener('click', () => switchDoc(id));
-  const loading = document.getElementById('sidebar_' + id);
-  if (loading) loading.replaceWith(item); else fileList.appendChild(item);
-  sidebarEmpty.style.display = 'none';
+const doc = docs[id];
+const item = document.createElement('div');
+item.className = 'file-item';
+item.id = 'sidebar_' + id;
+item.innerHTML = `<div class="file-icon">${doc.name.split('.').pop().toUpperCase()}</div><div class="file-info"><div class="file-name" title="${esc(doc.name)}">${esc(doc.name)}</div><div class="file-size">${(doc.size / 1024).toFixed(1)} KB | ${doc.wordCount.toLocaleString()} words</div></div><button class="remove-btn" type="button" onclick="removeDoc('${id}',event)" title="Remove">✕</button>`;
+item.addEventListener('click', () => switchDoc(id));
+const loading = document.getElementById('sidebar_' + id);
+if (loading) loading.replaceWith(item); else fileList.appendChild(item);
+sidebarEmpty.style.display = 'none';
 }
 
 function removeDoc(id, event) {
-  if (event) event.stopPropagation();
-  delete docs[id];
-  document.getElementById('sidebar_' + id)?.remove();
-  const remaining = Object.keys(docs);
-  if (activeId === id) {
-    if (remaining.length) switchDoc(remaining[0]);
-    else { activeId = null; viewer.style.display = 'none'; emptyState.style.display = 'block'; }
-  }
-  if (!remaining.length) sidebarEmpty.style.display = '';
-  showToast('Document removed');
+if (event) event.stopPropagation();
+delete docs[id];
+document.getElementById('sidebar_' + id)?.remove();
+const remaining = Object.keys(docs);
+if (activeId === id) {
+if (remaining.length) switchDoc(remaining[0]);
+else { activeId = null; viewer.style.display = 'none'; emptyState.style.display = 'block'; }
+}
+if (!remaining.length) sidebarEmpty.style.display = '';
+showToast('Document removed');
 }
 
 function switchDoc(id) {
-  activeId = id;
-  document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
-  document.getElementById('sidebar_' + id)?.classList.add('active');
-  renderDoc();
+activeId = id;
+document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
+document.getElementById('sidebar_' + id)?.classList.add('active');
+renderDoc();
 }
 
 function setTab(tab) { activeTab = tab; renderDoc(); }
 
 function renderDoc() {
-  const doc = docs[activeId];
-  if (!doc) return;
-  const pages = Math.max(1, Math.ceil(doc.wordCount / 300));
-  const body  = activeTab === 'summary' ? doc.summaryHtml : doc.html;
-  viewer.innerHTML = `<div class="panel">
-    <div class="vh-icon">DOCX</div>
-    <div>
-      <div class="vh-title">${esc(doc.name)}</div>
-      <div class="vh-meta">${doc.wordCount.toLocaleString()} words | ${(doc.size / 1024).toFixed(1)} KB | ~${pages} pages</div>
-    </div>
-    <div class="actions">
-      <button class="btn" type="button" onclick="printDoc()">Print</button>
-      <button class="btn primary" type="button" onclick="copyText()">Copy text</button>
-    </div>
-  </div>
-  <div class="tabs">
-    <button class="tab ${activeTab === 'document' ? 'active' : ''}" type="button" onclick="setTab('document')">Document</button>
-    <button class="tab ${activeTab === 'summary'  ? 'active' : ''}" type="button" onclick="setTab('summary')">Summary <span class="tab-count">${doc.summaryMatches}</span></button>
-  </div>
-  <div class="doc" id="docBody">${body}</div>`;
-  viewer.style.display  = 'flex';
-  emptyState.style.display = 'none';
+const doc = docs[activeId];
+if (!doc) return;
+const pages = Math.max(1, Math.ceil(doc.wordCount / 300));
+const body = activeTab === 'summary' ? doc.summaryHtml : doc.html;
+viewer.innerHTML = `<div class="panel">
+<div class="vh-icon">DOCX</div>
+<div>
+<div class="vh-title">${esc(doc.name)}</div>
+<div class="vh-meta">${doc.wordCount.toLocaleString()} words | ${(doc.size / 1024).toFixed(1)} KB | ~${pages} pages</div>
+</div>
+<div class="actions">
+<button class="btn" type="button" onclick="printDoc()">Print</button>
+<button class="btn primary" type="button" onclick="copyText()">Copy text</button>
+</div>
+</div>
+<div class="tabs">
+<button class="tab ${activeTab === 'document' ? 'active' : ''}" type="button" onclick="setTab('document')">Document</button>
+<button class="tab ${activeTab === 'summary' ? 'active' : ''}" type="button" onclick="setTab('summary')">Summary <span class="tab-count">${doc.summaryMatches}</span></button>
+</div>
+<div class="doc" id="docBody">${body}</div>`;
+viewer.style.display = 'flex';
+emptyState.style.display = 'none';
 }
 
 function showLoading(id, name) {
-  const item = document.createElement('div');
-  item.className = 'file-item';
-  item.id = 'sidebar_' + id;
-  item.innerHTML = `<div class="file-icon">...</div><div class="file-info"><div class="file-name">${esc(name)}</div><div class="file-size">Extracting...</div></div>`;
-  const old = document.getElementById('sidebar_' + id);
-  if (old) old.replaceWith(item); else fileList.appendChild(item);
-  sidebarEmpty.style.display = 'none';
-  if (!activeId) {
-    viewer.style.display = 'flex';
-    viewer.innerHTML = `<div class="state" style="width:100%;padding:40px 0"><div class="spinner"></div><div class="state-title">Extracting document...</div><div>Parsing tables, headings, and formatting from <strong>${esc(name)}</strong>.</div><div class="progress"></div></div>`;
-    emptyState.style.display = 'none';
-  }
+const item = document.createElement('div');
+item.className = 'file-item';
+item.id = 'sidebar_' + id;
+item.innerHTML = `<div class="file-icon">...</div><div class="file-info"><div class="file-name">${esc(name)}</div><div class="file-size">Extracting...</div></div>`;
+const old = document.getElementById('sidebar_' + id);
+if (old) old.replaceWith(item); else fileList.appendChild(item);
+sidebarEmpty.style.display = 'none';
+if (!activeId) {
+viewer.style.display = 'flex';
+viewer.innerHTML = `<div class="state" style="width:100%;padding:40px 0"><div class="spinner"></div><div class="state-title">Extracting document...</div><div>Parsing tables, headings, and formatting from <strong>${esc(name)}</strong>.</div><div class="progress"></div></div>`;
+emptyState.style.display = 'none';
+}
 }
 
 function removeLoading(id) {
-  document.getElementById('sidebar_' + id)?.remove();
-  if (!Object.keys(docs).length) sidebarEmpty.style.display = '';
+document.getElementById('sidebar_' + id)?.remove();
+if (!Object.keys(docs).length) sidebarEmpty.style.display = '';
 }
 
 function printDoc() {
-  const doc = docs[activeId];
-  if (!doc) return;
-  const html = activeTab === 'summary' ? doc.summaryHtml : doc.html;
-  const win  = window.open('', '_blank');
-  if (!win) { showToast('Popup blocked while opening print view'); return; }
-  win.document.write(`<html><head><title>${esc(doc.name)}</title><style>body{font-family:Georgia,serif;line-height:1.7;padding:2cm;color:#111}table{width:100%;border-collapse:collapse;margin:1em 0}th{background:#222;color:#fff;padding:.4em .8em;text-align:left;font-size:.8em}td{border:1px solid #ccc;padding:.4em .8em}h1,h2,h3{font-family:Georgia,serif}h1{border-bottom:2px solid #111;padding-bottom:.3em}h2{border-bottom:1px solid #ccc}</style></head><body>${html}</body></html>`);
+const doc = docs[activeId];
+if (!doc) return;
+const html = activeTab === 'summary' ? doc.summaryHtml : doc.html;
+const win = window.open('', '_blank');
+if (!win) { showToast('Popup blocked while opening print view'); return; }
+win.document.write(`<html><head><title>${esc(doc.name)}</title><style>body{font-family:Georgia,serif;line-height:1.7;padding:2cm;color:#111}table{width:100%;border-collapse:collapse;margin:1em 0}th{background:#222;color:#fff;padding:.4em .8em;text-align:left;font-size:.8em}td{border:1px solid #ccc;padding:.4em .8em}h1,h2,h3{font-family:Georgia,serif}h1{border-bottom:2px solid #111;padding-bottom:.3em}h2{border-bottom:1px solid #ccc}</style></head><body>${html}</body></html>`);
 
 win.document.close();
 win.focus();
@@ -453,8 +482,8 @@ function copyText() {
 const body = document.getElementById(‘docBody’);
 if (!body) return;
 navigator.clipboard.writeText(body.innerText)
-.then(()  => showToast(‘Text copied to clipboard’))
-.catch(()  => showToast(‘Clipboard copy failed’));
+.then(() => showToast(‘Text copied to clipboard’))
+.catch(() => showToast(‘Clipboard copy failed’));
 }
 
 function esc(str) {
