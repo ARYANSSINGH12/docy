@@ -1,4 +1,5 @@
 <!doctype html>
+
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -7,7 +8,94 @@
 <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"></script>
 <style>
-*{box-sizing:border-box;margin:0;padding:0} :root{--bg:#f5f6fb;--card:#fff;--ink:#1d1f27;--muted:#6f7484;--line:#e5e8f0;--accent:#2950ff;--accentSoft:#eef2ff;--good:#138f55;--goodSoft:#edf8f1;--warn:#d94f28;--warnSoft:#fff3ef;--shadow:0 10px 30px rgba(18,25,38,.08)} html,body{height:100%} body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column} header{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#161821;color:#fff;position:sticky;top:0;z-index:10} .logo{display:flex;align-items:center;gap:10px;font-family:'DM Serif Display',serif;font-size:1.25rem} .logo-mark{width:28px;height:28px;border-radius:8px;background:var(--accent);display:grid;place-items:center;font:500 .75rem 'DM Mono',monospace} .meta{font:400 .74rem 'DM Mono',monospace;color:rgba(255,255,255,.55)} .app{flex:1;display:flex;min-height:0} aside{width:285px;background:var(--card);border-right:1px solid var(--line);padding:18px 14px;overflow:auto} .aside-title{font:600 .72rem 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px} .file-list{display:flex;flex-direction:column;gap:8px} .empty-side,.state{text-align:center;color:var(--muted)} .empty-side{padding:28px 12px;font-size:.86rem;line-height:1.6} .file-item{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid transparent;border-radius:12px;background:#fff;cursor:pointer} .file-item:hover{background:#fafbff}.file-item.active{background:var(--accentSoft);border-color:var(--accent)} .file-icon{width:34px;height:40px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;font:600 .68rem 'DM Mono',monospace;color:var(--accent);background:#f8faff;flex-shrink:0} .file-item.active .file-icon{background:var(--accent);color:#fff;border-color:var(--accent)} .file-info{flex:1;min-width:0}.file-name{font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.file-size{font:.68rem 'DM Mono',monospace;color:var(--muted);margin-top:3px}.remove-btn{border:none;background:transparent;color:var(--muted);width:22px;height:22px;border-radius:6px;cursor:pointer;flex-shrink:0}.remove-btn:hover{background:var(--warnSoft);color:var(--warn)} main{flex:1;overflow:auto;position:relative} .drop-zone,.panel,.tabs,.doc{background:var(--card);box-shadow:var(--shadow)} .drop-zone{margin:24px;border:2px dashed #d6dbea;border-radius:20px;padding:48px 24px;text-align:center;position:relative;transition:.18s} .drop-zone.dragover,.drop-zone:hover{border-color:var(--accent);background:var(--accentSoft)} .drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer} .drop-icon{width:64px;height:64px;border-radius:18px;background:var(--accentSoft);display:grid;place-items:center;margin:0 auto 16px;font:600 1rem 'DM Mono',monospace;color:var(--accent)} .drop-title{font-family:'DM Serif Display',serif;font-size:1.55rem;margin-bottom:8px} .drop-sub{color:var(--muted);line-height:1.7;font-size:.92rem} .drop-badge{display:inline-block;margin-top:14px;padding:6px 12px;border-radius:999px;background:var(--goodSoft);color:var(--good);font:600 .72rem 'DM Mono',monospace} .viewer{display:none;flex-direction:column;gap:14px;padding:0 24px 24px} .panel{border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap} .vh-icon{width:44px;height:52px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font:600 .78rem 'DM Mono',monospace} .vh-title{font-family:'DM Serif Display',serif;font-size:1.12rem}.vh-meta{margin-top:4px;color:var(--muted);font:.74rem 'DM Mono',monospace}.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:10px;font-size:.82rem;font-weight:500;cursor:pointer}.btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accentSoft)} .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.primary:hover{background:#163eea;color:#fff}.tabs{display:inline-flex;gap:6px;padding:6px;border:1px solid var(--line);border-radius:999px;width:max-content} .tab{border:none;background:transparent;padding:9px 14px;border-radius:999px;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;display:flex;gap:8px;align-items:center}.tab:hover{background:var(--accentSoft);color:var(--accent)} .tab.active{background:var(--accent);color:#fff}.tab-count{font:.72rem 'DM Mono',monospace;opacity:.85} .doc{border:1px solid var(--line);border-radius:16px;padding:28px 34px;color:#3e4350;line-height:1.72;font-size:.95rem} .doc h1{font-family:'DM Serif Display',serif;font-size:1.7rem;color:var(--ink);padding-bottom:.5rem;border-bottom:2px solid var(--ink);margin-bottom:1rem}.doc h2{font-family:'DM Serif Display',serif;font-size:1.25rem;color:var(--ink);margin:1.7rem 0 .7rem;padding-bottom:.35rem;border-bottom:1px solid var(--line)} .doc h3{margin:1.2rem 0 .45rem;color:var(--accent);font-size:.85rem;text-transform:uppercase;letter-spacing:.05em}.doc p,.doc ul,.doc ol,.doc table{margin-bottom:.85rem}.doc ul,.doc ol{padding-left:1.3rem}.doc table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.05)} .doc th{background:var(--ink);color:#fff;padding:.72rem .9rem;text-align:left;font-size:.73rem;text-transform:uppercase;letter-spacing:.05em}.doc td{padding:.68rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}.doc tbody tr:nth-child(even){background:#fafbff}.callout-warn,.callout-ok,.callout-info{padding:.85rem 1rem;border-radius:0 10px 10px 0;border-left:4px solid transparent}.callout-warn{background:var(--warnSoft);border-color:var(--warn)} .callout-ok{background:var(--goodSoft);border-color:var(--good)} .callout-info{background:var(--accentSoft);border-color:var(--accent)} .summary-layout{display:flex;flex-direction:column;gap:16px} .summary-note{padding:14px 16px;border:1px solid #d9e0ff;background:linear-gradient(135deg,#f8f9ff,#eef3ff);border-radius:14px;font-size:.85rem} .summary-section{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fcfcff} .summary-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center;background:linear-gradient(135deg,#fff,#f8faff)} .summary-title{font-family:'DM Serif Display',serif;font-size:1.12rem;color:var(--ink)} .summary-sub{color:var(--muted);font:.74rem 'DM Mono',monospace;margin-top:3px} .chip{padding:6px 10px;border-radius:999px;background:var(--accentSoft);color:var(--accent);font:.72rem 'DM Mono',monospace} .summary-body{padding:14px 16px;display:flex;flex-direction:column;gap:12px} .summary-entry{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff} .summary-context{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px} .summary-empty{padding:16px;border:1px dashed var(--line);border-radius:12px;background:#fafbfe;color:var(--muted);font-size:.85rem} .state-wrap{padding:48px 24px}.state{max-width:360px;margin:0 auto;line-height:1.7}.state-title{font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--ink);margin-bottom:8px}.spinner{width:36px;height:36px;border-radius:999px;border:3px solid var(--line);border-top-color:var(--accent);margin:0 auto 16px;animation:spin .8s linear infinite}.progress{width:220px;height:4px;border-radius:999px;background:var(--line);margin:12px auto 0;overflow:hidden}.progress::after{content:"";display:block;width:40%;height:100%;background:var(--accent);animation:progress 1.4s ease-in-out infinite}.privacy{padding:10px 24px;background:var(--goodSoft);border-top:1px solid #c5e7d4;color:var(--good);font-size:.74rem;font-weight:500} .toast,.scroll-top{position:fixed;right:18px;box-shadow:var(--shadow);z-index:20} .toast{bottom:18px;background:#161821;color:#fff;padding:12px 16px;border-radius:12px;font-size:.83rem;transform:translateY(120%);opacity:0;transition:.25s} .toast.show{transform:translateY(0);opacity:1} .scroll-top{bottom:72px;width:46px;height:46px;border:none;border-radius:999px;background:var(--accent);color:#fff;font-size:1.2rem;cursor:pointer;display:grid;place-items:center;opacity:0;pointer-events:none;transform:translateY(10px);transition:.2s} .scroll-top.show{opacity:1;pointer-events:auto;transform:translateY(0)} @keyframes spin{to{transform:rotate(360deg)}} @keyframes progress{0%{transform:translateX(-120%)}100%{transform:translateX(330%)}} @media (max-width:780px){aside{display:none}.viewer{padding:0 16px 16px}.drop-zone{margin:16px}.doc{padding:20px}.actions{margin-left:0;width:100%;justify-content:flex-start}.tabs{width:100%;justify-content:space-between}.tab{flex:1;justify-content:center}}
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#f5f6fb;--card:#fff;--ink:#1d1f27;--muted:#6f7484;--line:#e5e8f0;--accent:#2950ff;--accentSoft:#eef2ff;--good:#138f55;--goodSoft:#edf8f1;--warn:#d94f28;--warnSoft:#fff3ef;--shadow:0 10px 30px rgba(18,25,38,.08)}
+html,body{height:100%}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+header{height:58px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#161821;color:#fff;position:sticky;top:0;z-index:10}
+.logo{display:flex;align-items:center;gap:10px;font-family:'DM Serif Display',serif;font-size:1.25rem}
+.logo-mark{width:28px;height:28px;border-radius:8px;background:var(--accent);display:grid;place-items:center;font:500 .75rem 'DM Mono',monospace}
+.meta{font:400 .74rem 'DM Mono',monospace;color:rgba(255,255,255,.55)}
+.app{flex:1;display:flex;min-height:0}
+aside{width:285px;background:var(--card);border-right:1px solid var(--line);padding:18px 14px;overflow:auto}
+.aside-title{font:600 .72rem 'DM Mono',monospace;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);margin-bottom:12px}
+.file-list{display:flex;flex-direction:column;gap:8px}
+.empty-side,.state{text-align:center;color:var(--muted)}
+.empty-side{padding:28px 12px;font-size:.86rem;line-height:1.6}
+.file-item{display:flex;gap:10px;align-items:center;padding:10px;border:1px solid transparent;border-radius:12px;background:#fff;cursor:pointer}
+.file-item:hover{background:#fafbff}
+.file-item.active{background:var(--accentSoft);border-color:var(--accent)}
+.file-icon{width:34px;height:40px;border-radius:8px;border:1px solid var(--line);display:grid;place-items:center;font:600 .68rem 'DM Mono',monospace;color:var(--accent);background:#f8faff;flex-shrink:0}
+.file-item.active .file-icon{background:var(--accent);color:#fff;border-color:var(--accent)}
+.file-info{flex:1;min-width:0}
+.file-name{font-size:.82rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.file-size{font:.68rem 'DM Mono',monospace;color:var(--muted);margin-top:3px}
+.remove-btn{border:none;background:transparent;color:var(--muted);width:22px;height:22px;border-radius:6px;cursor:pointer;flex-shrink:0}
+.remove-btn:hover{background:var(--warnSoft);color:var(--warn)}
+main{flex:1;overflow:auto;position:relative}
+.drop-zone,.panel,.tabs,.doc{background:var(--card);box-shadow:var(--shadow)}
+.drop-zone{margin:24px;border:2px dashed #d6dbea;border-radius:20px;padding:48px 24px;text-align:center;position:relative;transition:.18s}
+.drop-zone.dragover,.drop-zone:hover{border-color:var(--accent);background:var(--accentSoft)}
+.drop-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.drop-icon{width:64px;height:64px;border-radius:18px;background:var(--accentSoft);display:grid;place-items:center;margin:0 auto 16px;font:600 1rem 'DM Mono',monospace;color:var(--accent)}
+.drop-title{font-family:'DM Serif Display',serif;font-size:1.55rem;margin-bottom:8px}
+.drop-sub{color:var(--muted);line-height:1.7;font-size:.92rem}
+.drop-badge{display:inline-block;margin-top:14px;padding:6px 12px;border-radius:999px;background:var(--goodSoft);color:var(--good);font:600 .72rem 'DM Mono',monospace}
+.viewer{display:none;flex-direction:column;gap:14px;padding:0 24px 24px}
+.panel{border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+.vh-icon{width:44px;height:52px;border-radius:10px;background:var(--accent);color:#fff;display:grid;place-items:center;font:600 .78rem 'DM Mono',monospace}
+.vh-title{font-family:'DM Serif Display',serif;font-size:1.12rem}
+.vh-meta{margin-top:4px;color:var(--muted);font:.74rem 'DM Mono',monospace}
+.actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#fff;color:var(--ink);padding:9px 14px;border-radius:10px;font-size:.82rem;font-weight:500;cursor:pointer}
+.btn:hover{border-color:var(--accent);color:var(--accent);background:var(--accentSoft)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#163eea;color:#fff}
+.tabs{display:inline-flex;gap:6px;padding:6px;border:1px solid var(--line);border-radius:999px;width:max-content}
+.tab{border:none;background:transparent;padding:9px 14px;border-radius:999px;font-size:.82rem;font-weight:600;color:var(--muted);cursor:pointer;display:flex;gap:8px;align-items:center}
+.tab:hover{background:var(--accentSoft);color:var(--accent)}
+.tab.active{background:var(--accent);color:#fff}
+.tab-count{font:.72rem 'DM Mono',monospace;opacity:.85}
+.doc{border:1px solid var(--line);border-radius:16px;padding:28px 34px;color:#3e4350;line-height:1.72;font-size:.95rem}
+.doc h1{font-family:'DM Serif Display',serif;font-size:1.7rem;color:var(--ink);padding-bottom:.5rem;border-bottom:2px solid var(--ink);margin-bottom:1rem}
+.doc h2{font-family:'DM Serif Display',serif;font-size:1.25rem;color:var(--ink);margin:1.7rem 0 .7rem;padding-bottom:.35rem;border-bottom:1px solid var(--line)}
+.doc h3{margin:1.2rem 0 .45rem;color:var(--accent);font-size:.85rem;text-transform:uppercase;letter-spacing:.05em}
+.doc p,.doc ul,.doc ol,.doc table{margin-bottom:.85rem}
+.doc ul,.doc ol{padding-left:1.3rem}
+.doc table{width:100%;border-collapse:collapse;overflow:hidden;border-radius:10px;box-shadow:0 2px 10px rgba(0,0,0,.05)}
+.doc th{background:var(--ink);color:#fff;padding:.72rem .9rem;text-align:left;font-size:.73rem;text-transform:uppercase;letter-spacing:.05em}
+.doc td{padding:.68rem .9rem;border-bottom:1px solid var(--line);vertical-align:top}
+.doc tbody tr:nth-child(even){background:#fafbff}
+.callout-warn,.callout-ok,.callout-info{padding:.85rem 1rem;border-radius:0 10px 10px 0;border-left:4px solid transparent}
+.callout-warn{background:var(--warnSoft);border-color:var(--warn)}
+.callout-ok{background:var(--goodSoft);border-color:var(--good)}
+.callout-info{background:var(--accentSoft);border-color:var(--accent)}
+.summary-layout{display:flex;flex-direction:column;gap:16px}
+.summary-note{padding:14px 16px;border:1px solid #d9e0ff;background:linear-gradient(135deg,#f8f9ff,#eef3ff);border-radius:14px;font-size:.85rem}
+.summary-section{border:1px solid var(--line);border-radius:14px;overflow:hidden;background:#fcfcff}
+.summary-head{padding:14px 16px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:12px;align-items:center;background:linear-gradient(135deg,#fff,#f8faff)}
+.summary-title{font-family:'DM Serif Display',serif;font-size:1.12rem;color:var(--ink)}
+.summary-sub{color:var(--muted);font:.74rem 'DM Mono',monospace;margin-top:3px}
+.chip{padding:6px 10px;border-radius:999px;background:var(--accentSoft);color:var(--accent);font:.72rem 'DM Mono',monospace}
+.summary-body{padding:14px 16px;display:flex;flex-direction:column;gap:12px}
+.summary-entry{border:1px solid var(--line);border-radius:12px;padding:14px;background:#fff}
+.summary-context{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:8px}
+.summary-empty{padding:16px;border:1px dashed var(--line);border-radius:12px;background:#fafbfe;color:var(--muted);font-size:.85rem}
+.state-wrap{padding:48px 24px}
+.state{max-width:360px;margin:0 auto;line-height:1.7}
+.state-title{font-family:'DM Serif Display',serif;font-size:1.35rem;color:var(--ink);margin-bottom:8px}
+.spinner{width:36px;height:36px;border-radius:999px;border:3px solid var(--line);border-top-color:var(--accent);margin:0 auto 16px;animation:spin .8s linear infinite}
+.progress{width:220px;height:4px;border-radius:999px;background:var(--line);margin:12px auto 0;overflow:hidden}
+.progress::after{content:"";display:block;width:40%;height:100%;background:var(--accent);animation:progress 1.4s ease-in-out infinite}
+.privacy{padding:10px 24px;background:var(--goodSoft);border-top:1px solid #c5e7d4;color:var(--good);font-size:.74rem;font-weight:500}
+.toast,.scroll-top{position:fixed;right:18px;box-shadow:var(--shadow);z-index:20}
+.toast{bottom:18px;background:#161821;color:#fff;padding:12px 16px;border-radius:12px;font-size:.83rem;transform:translateY(120%);opacity:0;transition:.25s}
+.toast.show{transform:translateY(0);opacity:1}
+.scroll-top{bottom:72px;width:46px;height:46px;border:none;border-radius:999px;background:var(--accent);color:#fff;font-size:1.2rem;cursor:pointer;display:grid;place-items:center;opacity:0;pointer-events:none;transform:translateY(10px);transition:.2s}
+.scroll-top.show{opacity:1;pointer-events:auto;transform:translateY(0)}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes progress{0%{transform:translateX(-120%)}100%{transform:translateX(330%)}}
+@media (max-width:780px){aside{display:none}.viewer{padding:0 16px 16px}.drop-zone{margin:16px}.doc{padding:20px}.actions{margin-left:0;width:100%;justify-content:flex-start}.tabs{width:100%;justify-content:space-between}.tab{flex:1;justify-content:center}}
 </style>
 </head>
 <body>
@@ -15,7 +103,6 @@
   <div class="logo"><div class="logo-mark">DOC</div>DocView</div>
   <div class="meta">100% Client-Side | No Storage | No AI</div>
 </header>
-
 <div class="app">
   <aside>
     <div class="aside-title">Loaded Documents</div>
@@ -23,7 +110,6 @@
       <div class="empty-side" id="sidebarEmpty">No documents yet.<br>Upload <strong>.docx</strong> files to begin.</div>
     </div>
   </aside>
-
   <main id="main">
     <div class="drop-zone" id="dropZone">
       <input type="file" id="fileInput" accept=".docx" multiple>
@@ -32,9 +118,7 @@
       <div class="drop-sub">Supports <strong>.docx</strong> files, including large contracts. All processing happens in your browser.</div>
       <div class="drop-badge">Secure - nothing leaves your device</div>
     </div>
-
     <div class="viewer" id="viewer"></div>
-
     <div class="state-wrap" id="emptyState">
       <div class="state">
         <div class="state-title">Select a document</div>
@@ -43,264 +127,349 @@
     </div>
   </main>
 </div>
-
 <div class="privacy"><strong>Privacy guaranteed:</strong> all extraction runs entirely in the browser. No data is sent to a server or stored.</div>
 <button class="scroll-top" id="scrollTopBtn" type="button" aria-label="Scroll to top" title="Scroll to top">&uarr;</button>
 <div class="toast" id="toast"></div>
 
 <script>
-const CATEGORIES=[
-  {key:'pharma',title:'Pharmaceutical Products',subtitle:'Only passages or table rows mentioning pharmaceutical products are shown here.',match:t=>/\bpharmaceutical(?:\s+products?)?\b/i.test(t)},
-  {key:'ortho',title:'Orthopedic Appliance',subtitle:'Only passages or table rows mentioning orthopedic appliances are shown here.',match:t=>/\borthop(?:a)?edic(?:\s+appliances?)?\b/i.test(t)}
+// ─── CATEGORIES ───────────────────────────────────────────────────────────────
+// FIX 1: Broadened regex patterns.
+//   Old pharma regex:  /\bpharmaceutical(?:\s+products?)?\b/
+//     → failed on "pharmaceuticals" because \b sits mid-word after "pharmaceutical"
+//   Old ortho regex:   /\borthop(?:a)?edic(?:\s+appliances?)?\b/
+//     → failed on "orthopaedics", "orthopedics", "orthopedic implants", etc.
+//   New regexes match any word that starts with the stem, covering all plurals/variants.
+const CATEGORIES = [
+  {
+    key: 'pharma',
+    title: 'Pharmaceutical Products',
+    subtitle: 'Only passages or table rows mentioning pharmaceutical products are shown here.',
+    // Matches: pharmaceutical, pharmaceuticals, pharmaceutical product/products,
+    //          pharmacy, pharmacies, pharma (as a standalone word)
+    match: t => /\bpharmaceutical|\bpharmac(?:y|ies)\b/i.test(t)
+  },
+  {
+    key: 'ortho',
+    title: 'Orthopedic Appliance',
+    subtitle: 'Only passages or table rows mentioning orthopedic appliances are shown here.',
+    // Matches: orthopedic, orthopaedic, orthopedics, orthopaedics,
+    //          orthopedic appliance/implant/prosthesis and all British spellings
+    match: t => /\borthop(?:a)?edic/i.test(t)
+  }
 ];
-const docs={}; let activeId=null; let activeTab='document';
-const fileInput=document.getElementById('fileInput');
-const dropZone=document.getElementById('dropZone');
-const fileList=document.getElementById('fileList');
-const sidebarEmpty=document.getElementById('sidebarEmpty');
-const viewer=document.getElementById('viewer');
-const emptyState=document.getElementById('emptyState');
-const main=document.getElementById('main');
-const scrollTopBtn=document.getElementById('scrollTopBtn');
 
-dropZone.addEventListener('dragover',e=>{e.preventDefault();dropZone.classList.add('dragover')});
-dropZone.addEventListener('dragleave',()=>dropZone.classList.remove('dragover'));
-dropZone.addEventListener('drop',e=>{e.preventDefault();dropZone.classList.remove('dragover');handleFiles([...e.dataTransfer.files])});
-fileInput.addEventListener('change',()=>{handleFiles([...fileInput.files]);fileInput.value=''});
-main.addEventListener('scroll',()=>scrollTopBtn.classList.toggle('show',main.scrollTop>280));
-scrollTopBtn.addEventListener('click',()=>main.scrollTo({top:0,behavior:'smooth'}));
+// ─── STATE ────────────────────────────────────────────────────────────────────
+const docs = {};
+let activeId = null;
+let activeTab = 'document';
 
-async function handleFiles(files){
-  const docxFiles=files.filter(f=>f.name.toLowerCase().endsWith('.docx'));
-  if(!docxFiles.length){showToast('Only .docx files are supported');return}
-  for(const file of docxFiles){
-    const id='doc_'+Date.now()+'_'+Math.random().toString(36).slice(2,8);
-    showLoading(id,file.name);
-    try{
-      const html=await extractDocx(file);
-      const wordCount=countWords(html);
-      const summary=buildSummary(html);
-      docs[id]={name:file.name,size:file.size,html,wordCount,summaryHtml:summary.html,summaryMatches:summary.count};
+const fileInput     = document.getElementById('fileInput');
+const dropZone      = document.getElementById('dropZone');
+const fileList      = document.getElementById('fileList');
+const sidebarEmpty  = document.getElementById('sidebarEmpty');
+const viewer        = document.getElementById('viewer');
+const emptyState    = document.getElementById('emptyState');
+const main          = document.getElementById('main');
+const scrollTopBtn  = document.getElementById('scrollTopBtn');
+
+dropZone.addEventListener('dragover',  e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+dropZone.addEventListener('dragleave', ()  => dropZone.classList.remove('dragover'));
+dropZone.addEventListener('drop',      e  => { e.preventDefault(); dropZone.classList.remove('dragover'); handleFiles([...e.dataTransfer.files]); });
+fileInput.addEventListener('change',   ()  => { handleFiles([...fileInput.files]); fileInput.value = ''; });
+main.addEventListener('scroll',        ()  => scrollTopBtn.classList.toggle('show', main.scrollTop > 280));
+scrollTopBtn.addEventListener('click', ()  => main.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// ─── FILE HANDLING ────────────────────────────────────────────────────────────
+async function handleFiles(files) {
+  const docxFiles = files.filter(f => f.name.toLowerCase().endsWith('.docx'));
+  if (!docxFiles.length) { showToast('Only .docx files are supported'); return; }
+  for (const file of docxFiles) {
+    const id = 'doc_' + Date.now() + '_' + Math.random().toString(36).slice(2, 8);
+    showLoading(id, file.name);
+    try {
+      const html = await extractDocx(file);
+      const wordCount = countWords(html);
+      const summary = buildSummary(html);
+      docs[id] = { name: file.name, size: file.size, html, wordCount, summaryHtml: summary.html, summaryMatches: summary.count };
       addSidebarItem(id);
-      if(!activeId) switchDoc(id);
-    }catch(err){
+      if (!activeId) switchDoc(id);
+    } catch (err) {
       console.error(err);
       removeLoading(id);
-      showToast('Failed to parse: '+file.name);
+      showToast('Failed to parse: ' + file.name);
     }
   }
 }
 
-function extractDocx(file){
-  return new Promise((resolve,reject)=>{
-    const reader=new FileReader();
-    reader.onload=e=>{
-      mammoth.convertToHtml({arrayBuffer:e.target.result},{
-        styleMap:[
+function extractDocx(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      mammoth.convertToHtml({ arrayBuffer: e.target.result }, {
+        styleMap: [
           "p[style-name='Heading 1'] => h1:fresh",
           "p[style-name='Heading 2'] => h2:fresh",
           "p[style-name='Heading 3'] => h3:fresh",
-          "p[style-name='Title'] => h1:fresh",
-          "r[style-name='Strong'] => strong",
-          "r[style-name='Emphasis'] => em"
+          "p[style-name='Title']     => h1:fresh",
+          "r[style-name='Strong']    => strong",
+          "r[style-name='Emphasis']  => em"
         ]
-      }).then(r=>resolve(postProcess(r.value))).catch(reject);
+      }).then(r => resolve(postProcess(r.value))).catch(reject);
     };
-    reader.onerror=reject;
+    reader.onerror = reject;
     reader.readAsArrayBuffer(file);
   });
 }
 
-function postProcess(html){
-  const doc=new DOMParser().parseFromString('<div id="root">'+html+'</div>','text/html');
-  const root=doc.getElementById('root');
-  root.querySelectorAll('p,td').forEach(el=>{
-    const text=(el.textContent||'').trim();
-    const upper=text.toUpperCase();
-    if(/^(WARNING|CRITICAL|IMPORTANT|ALERT|\u26A0)/.test(upper)||text.startsWith('\u26A0')) el.classList.add('callout-warn');
-    else if(/^(NOTE|REMINDER|PLEASE NOTE|\u2713)/.test(upper)||text.startsWith('\u2713')) el.classList.add('callout-ok');
-    else if(/^(INFO|TIP)/.test(upper)||text.startsWith('\uD83D\uDCCB')||text.startsWith('\uD83D\uDCA1')) el.classList.add('callout-info');
+function postProcess(html) {
+  const doc  = new DOMParser().parseFromString('<div id="root">' + html + '</div>', 'text/html');
+  const root = doc.getElementById('root');
+  root.querySelectorAll('p,td').forEach(el => {
+    const text  = (el.textContent || '').trim();
+    const upper = text.toUpperCase();
+    if (/^(WARNING|CRITICAL|IMPORTANT|ALERT|⚠)/.test(upper) || text.startsWith('⚠'))
+      el.classList.add('callout-warn');
+    else if (/^(NOTE|REMINDER|PLEASE NOTE|✓)/.test(upper) || text.startsWith('✓'))
+      el.classList.add('callout-ok');
+    else if (/^(INFO|TIP)/.test(upper) || text.startsWith('📋') || text.startsWith('💡'))
+      el.classList.add('callout-info');
   });
   return root.innerHTML;
 }
 
-function buildSummary(html){
-  const parsed=new DOMParser().parseFromString('<div id="root">'+html+'</div>','text/html');
-  const root=parsed.getElementById('root');
-  const sections=CATEGORIES.map(category=>({category,entries:collectEntries(root,category.match)}));
-  const count=sections.reduce((sum,s)=>sum+s.entries.length,0);
-  if(!count) return {count,html:'<div class="summary-empty">No pharmaceutical products or orthopedic appliance references were found in this document.</div>'};
+// ─── SUMMARY BUILDER ─────────────────────────────────────────────────────────
+function buildSummary(html) {
+  const parsed = new DOMParser().parseFromString('<div id="root">' + html + '</div>', 'text/html');
+  const root   = parsed.getElementById('root');
+  const sections = CATEGORIES.map(category => ({ category, entries: collectEntries(root, category.match) }));
+  const count  = sections.reduce((sum, s) => sum + s.entries.length, 0);
+  if (!count) return {
+    count,
+    html: '<div class="summary-empty">No pharmaceutical products or orthopedic appliance references were found in this document.</div>'
+  };
   return {
     count,
-    html:`<div class="summary-layout">
+    html: `<div class="summary-layout">
       <div class="summary-note">Summary view is filtered to just two tracked categories: pharmaceutical products and orthopedic appliance. The full document remains unchanged in the Document tab.</div>
       ${sections.map(renderSummarySection).join('')}
     </div>`
   };
 }
 
-function collectEntries(root,match){
-  const entries=[]; const trail={h1:'',h2:'',h3:''};
-  [...root.children].forEach(node=>{
-    const tag=(node.tagName||'').toUpperCase();
-    if(tag==='H1'){trail.h1=node.textContent.trim();trail.h2='';trail.h3='';return}
-    if(tag==='H2'){trail.h2=node.textContent.trim();trail.h3='';return}
-    if(tag==='H3'){trail.h3=node.textContent.trim();return}
-    const html=extractRelevantHtml(node,match);
-    if(html) entries.push({context:[trail.h1,trail.h2,trail.h3].filter(Boolean).join(' / '),html});
-  });
+// FIX 2: collectEntries now walks the FULL DOM tree recursively.
+//   Old code used [...root.children].forEach — only direct children.
+//   mammoth output is usually flat, but some styles/tables can produce nested
+//   divs or sections. Recursive walk ensures nothing is missed.
+//   Heading tracking (h1/h2/h3 trail) is preserved across the full traversal.
+function collectEntries(root, match) {
+  const entries = [];
+  const trail   = { h1: '', h2: '', h3: '' };
+
+  function walk(parent) {
+    [...parent.children].forEach(node => {
+      const tag = (node.tagName || '').toUpperCase();
+
+      // Update heading trail
+      if (tag === 'H1') { trail.h1 = node.textContent.trim(); trail.h2 = ''; trail.h3 = ''; return; }
+      if (tag === 'H2') { trail.h2 = node.textContent.trim(); trail.h3 = ''; return; }
+      if (tag === 'H3') { trail.h3 = node.textContent.trim(); return; }
+
+      // Try to extract a matching snippet from known block elements
+      if (['P', 'TABLE', 'UL', 'OL'].includes(tag)) {
+        const html = extractRelevantHtml(node, match);
+        if (html) {
+          entries.push({ context: [trail.h1, trail.h2, trail.h3].filter(Boolean).join(' / '), html });
+          return; // don't descend further into an already-matched node
+        }
+        return; // P/UL/OL with no match — skip, no children to recurse into usefully
+      }
+
+      // For any other container (div, section, article, etc.) — recurse
+      if (node.children.length) walk(node);
+    });
+  }
+
+  walk(root);
   return entries;
 }
 
-function extractRelevantHtml(node,match){
-  const tag=(node.tagName||'').toUpperCase();
-  const text=(node.textContent||'').trim();
-  if(tag==='TABLE') return filterTable(node,match);
-  if(tag==='UL'||tag==='OL') return filterList(node,match);
-  return text&&match(text)?node.outerHTML:'';
+function extractRelevantHtml(node, match) {
+  const tag  = (node.tagName || '').toUpperCase();
+  const text = (node.textContent || '').trim();
+  if (tag === 'TABLE')          return filterTable(node, match);
+  if (tag === 'UL' || tag === 'OL') return filterList(node, match);
+  return text && match(text) ? node.outerHTML : '';
 }
 
-function filterTable(table,match){
-  const clone=table.cloneNode(true);
-  const rows=[...clone.querySelectorAll('tr')];
-  rows.forEach((row,index)=>{
-    const isHeader=index===0&&!!row.querySelector('th');
-    if(!isHeader&&!match(row.textContent||'')) row.remove();
+// FIX 3: filterTable — old code checked match() on the whole table AFTER row removal,
+//   which could return an empty header-only table if the header text happened to match.
+//   New code: track whether any actual data rows survived. Return '' if none did.
+function filterTable(table, match) {
+  const clone      = table.cloneNode(true);
+  const rows       = [...clone.querySelectorAll('tr')];
+  let dataRowKept  = false;
+
+  rows.forEach((row, index) => {
+    // Treat row 0 with <th> cells as the header — always keep it
+    const isHeader = index === 0 && !!row.querySelector('th');
+    if (isHeader) return;
+
+    if (match(row.textContent || '')) {
+      dataRowKept = true;  // this data row matched → keep it
+    } else {
+      row.remove();        // no match → remove it
+    }
   });
-  return clone.querySelector('tr')&&match(clone.textContent||'')?clone.outerHTML:'';
+
+  // Only return the table if at least one data row survived
+  return dataRowKept ? clone.outerHTML : '';
 }
 
-function filterList(list,match){
-  const clone=list.cloneNode(true);
-  [...clone.children].forEach(li=>{if(!match(li.textContent||'')) li.remove()});
-  return clone.children.length?clone.outerHTML:'';
+function filterList(list, match) {
+  const clone = list.cloneNode(true);
+  [...clone.children].forEach(li => { if (!match(li.textContent || '')) li.remove(); });
+  return clone.children.length ? clone.outerHTML : '';
 }
 
-function renderSummarySection(section){
-  const count=section.entries.length;
+function renderSummarySection(section) {
+  const count = section.entries.length;
   return `<section class="summary-section">
     <div class="summary-head">
       <div>
         <div class="summary-title">${section.category.title}</div>
         <div class="summary-sub">${section.category.subtitle}</div>
       </div>
-      <div class="chip">${count} match${count===1?'':'es'}</div>
+      <div class="chip">${count} match${count === 1 ? '' : 'es'}</div>
     </div>
     <div class="summary-body">
-      ${count?section.entries.map(entry=>`<div class="summary-entry">${entry.context?`<div class="summary-context">${esc(entry.context)}</div>`:''}${entry.html}</div>`).join(''):'<div class="summary-empty">No matching references were found for this category.</div>'}
+      ${count
+        ? section.entries.map(entry => `<div class="summary-entry">${entry.context ? `<div class="summary-context">${esc(entry.context)}</div>` : ''}${entry.html}</div>`).join('')
+        : '<div class="summary-empty">No matching references were found for this category.</div>'
+      }
     </div>
   </section>`;
 }
 
-function countWords(html){
-  const box=document.createElement('div'); box.innerHTML=html;
-  return (box.textContent||'').trim().split(/\s+/).filter(Boolean).length;
+// ─── UTILITIES ────────────────────────────────────────────────────────────────
+function countWords(html) {
+  const box = document.createElement('div');
+  box.innerHTML = html;
+  return (box.textContent || '').trim().split(/\s+/).filter(Boolean).length;
 }
 
-function addSidebarItem(id){
-  const doc=docs[id];
-  const item=document.createElement('div');
-  item.className='file-item';
-  item.id='sidebar_'+id;
-  item.innerHTML=`<div class="file-icon">${doc.name.split('.').pop().toUpperCase()}</div><div class="file-info"><div class="file-name" title="${esc(doc.name)}">${esc(doc.name)}</div><div class="file-size">${(doc.size/1024).toFixed(1)} KB | ${doc.wordCount.toLocaleString()} words</div></div><button class="remove-btn" type="button" onclick="removeDoc('${id}',event)" title="Remove">x</button>`;
-  item.addEventListener('click',()=>switchDoc(id));
-  const loading=document.getElementById('sidebar_'+id);
-  if(loading) loading.replaceWith(item); else fileList.appendChild(item);
-  sidebarEmpty.style.display='none';
+function addSidebarItem(id) {
+  const doc  = docs[id];
+  const item = document.createElement('div');
+  item.className = 'file-item';
+  item.id = 'sidebar_' + id;
+  item.innerHTML = `<div class="file-icon">${doc.name.split('.').pop().toUpperCase()}</div><div class="file-info"><div class="file-name" title="${esc(doc.name)}">${esc(doc.name)}</div><div class="file-size">${(doc.size / 1024).toFixed(1)} KB | ${doc.wordCount.toLocaleString()} words</div></div><button class="remove-btn" type="button" onclick="removeDoc('${id}',event)" title="Remove">✕</button>`;
+  item.addEventListener('click', () => switchDoc(id));
+  const loading = document.getElementById('sidebar_' + id);
+  if (loading) loading.replaceWith(item); else fileList.appendChild(item);
+  sidebarEmpty.style.display = 'none';
 }
 
-function removeDoc(id,event){
-  if(event) event.stopPropagation();
+function removeDoc(id, event) {
+  if (event) event.stopPropagation();
   delete docs[id];
-  document.getElementById('sidebar_'+id)?.remove();
-  const remaining=Object.keys(docs);
-  if(activeId===id){
-    if(remaining.length) switchDoc(remaining[0]);
-    else{activeId=null;viewer.style.display='none';emptyState.style.display='block'}
+  document.getElementById('sidebar_' + id)?.remove();
+  const remaining = Object.keys(docs);
+  if (activeId === id) {
+    if (remaining.length) switchDoc(remaining[0]);
+    else { activeId = null; viewer.style.display = 'none'; emptyState.style.display = 'block'; }
   }
-  if(!remaining.length) sidebarEmpty.style.display='';
+  if (!remaining.length) sidebarEmpty.style.display = '';
   showToast('Document removed');
 }
 
-function switchDoc(id){
-  activeId=id;
-  document.querySelectorAll('.file-item').forEach(el=>el.classList.remove('active'));
-  document.getElementById('sidebar_'+id)?.classList.add('active');
+function switchDoc(id) {
+  activeId = id;
+  document.querySelectorAll('.file-item').forEach(el => el.classList.remove('active'));
+  document.getElementById('sidebar_' + id)?.classList.add('active');
   renderDoc();
 }
 
-function setTab(tab){activeTab=tab;renderDoc()}
+function setTab(tab) { activeTab = tab; renderDoc(); }
 
-function renderDoc(){
-  const doc=docs[activeId]; if(!doc) return;
-  const pages=Math.max(1,Math.ceil(doc.wordCount/300));
-  const body=activeTab==='summary'?doc.summaryHtml:doc.html;
-  viewer.innerHTML=`<div class="panel">
-      <div class="vh-icon">DOCX</div>
-      <div>
-        <div class="vh-title">${esc(doc.name)}</div>
-        <div class="vh-meta">${doc.wordCount.toLocaleString()} words | ${(doc.size/1024).toFixed(1)} KB | ~${pages} pages</div>
-      </div>
-      <div class="actions">
-        <button class="btn" type="button" onclick="printDoc()">Print</button>
-        <button class="btn primary" type="button" onclick="copyText()">Copy text</button>
-      </div>
+function renderDoc() {
+  const doc = docs[activeId];
+  if (!doc) return;
+  const pages = Math.max(1, Math.ceil(doc.wordCount / 300));
+  const body  = activeTab === 'summary' ? doc.summaryHtml : doc.html;
+  viewer.innerHTML = `<div class="panel">
+    <div class="vh-icon">DOCX</div>
+    <div>
+      <div class="vh-title">${esc(doc.name)}</div>
+      <div class="vh-meta">${doc.wordCount.toLocaleString()} words | ${(doc.size / 1024).toFixed(1)} KB | ~${pages} pages</div>
     </div>
-    <div class="tabs">
-      <button class="tab ${activeTab==='document'?'active':''}" type="button" onclick="setTab('document')">Document</button>
-      <button class="tab ${activeTab==='summary'?'active':''}" type="button" onclick="setTab('summary')">Summary <span class="tab-count">${doc.summaryMatches}</span></button>
+    <div class="actions">
+      <button class="btn" type="button" onclick="printDoc()">Print</button>
+      <button class="btn primary" type="button" onclick="copyText()">Copy text</button>
     </div>
-    <div class="doc" id="docBody">${body}</div>`;
-  viewer.style.display='flex';
-  emptyState.style.display='none';
+  </div>
+  <div class="tabs">
+    <button class="tab ${activeTab === 'document' ? 'active' : ''}" type="button" onclick="setTab('document')">Document</button>
+    <button class="tab ${activeTab === 'summary'  ? 'active' : ''}" type="button" onclick="setTab('summary')">Summary <span class="tab-count">${doc.summaryMatches}</span></button>
+  </div>
+  <div class="doc" id="docBody">${body}</div>`;
+  viewer.style.display  = 'flex';
+  emptyState.style.display = 'none';
 }
 
-function showLoading(id,name){
-  const item=document.createElement('div');
-  item.className='file-item';
-  item.id='sidebar_'+id;
-  item.innerHTML=`<div class="file-icon">...</div><div class="file-info"><div class="file-name">${esc(name)}</div><div class="file-size">Extracting...</div></div>`;
-  const old=document.getElementById('sidebar_'+id);
-  if(old) old.replaceWith(item); else fileList.appendChild(item);
-  sidebarEmpty.style.display='none';
-  if(!activeId){
-    viewer.style.display='flex';
-    viewer.innerHTML=`<div class="state" style="width:100%;padding:40px 0"><div class="spinner"></div><div class="state-title">Extracting document...</div><div>Parsing tables, headings, and formatting from <strong>${esc(name)}</strong>.</div><div class="progress"></div></div>`;
-    emptyState.style.display='none';
+function showLoading(id, name) {
+  const item = document.createElement('div');
+  item.className = 'file-item';
+  item.id = 'sidebar_' + id;
+  item.innerHTML = `<div class="file-icon">...</div><div class="file-info"><div class="file-name">${esc(name)}</div><div class="file-size">Extracting...</div></div>`;
+  const old = document.getElementById('sidebar_' + id);
+  if (old) old.replaceWith(item); else fileList.appendChild(item);
+  sidebarEmpty.style.display = 'none';
+  if (!activeId) {
+    viewer.style.display = 'flex';
+    viewer.innerHTML = `<div class="state" style="width:100%;padding:40px 0"><div class="spinner"></div><div class="state-title">Extracting document...</div><div>Parsing tables, headings, and formatting from <strong>${esc(name)}</strong>.</div><div class="progress"></div></div>`;
+    emptyState.style.display = 'none';
   }
 }
 
-function removeLoading(id){
-  document.getElementById('sidebar_'+id)?.remove();
-  if(!Object.keys(docs).length) sidebarEmpty.style.display='';
+function removeLoading(id) {
+  document.getElementById('sidebar_' + id)?.remove();
+  if (!Object.keys(docs).length) sidebarEmpty.style.display = '';
 }
 
-function printDoc(){
-  const doc=docs[activeId]; if(!doc) return;
-  const html=activeTab==='summary'?doc.summaryHtml:doc.html;
-  const win=window.open('','_blank');
-  if(!win){showToast('Popup blocked while opening print view');return}
+function printDoc() {
+  const doc = docs[activeId];
+  if (!doc) return;
+  const html = activeTab === 'summary' ? doc.summaryHtml : doc.html;
+  const win  = window.open('', '_blank');
+  if (!win) { showToast('Popup blocked while opening print view'); return; }
   win.document.write(`<html><head><title>${esc(doc.name)}</title><style>body{font-family:Georgia,serif;line-height:1.7;padding:2cm;color:#111}table{width:100%;border-collapse:collapse;margin:1em 0}th{background:#222;color:#fff;padding:.4em .8em;text-align:left;font-size:.8em}td{border:1px solid #ccc;padding:.4em .8em}h1,h2,h3{font-family:Georgia,serif}h1{border-bottom:2px solid #111;padding-bottom:.3em}h2{border-bottom:1px solid #ccc}</style></head><body>${html}</body></html>`);
-  win.document.close(); win.focus(); win.print();
+
+win.document.close();
+win.focus();
+win.print();
 }
 
-function copyText(){
-  const body=document.getElementById('docBody'); if(!body) return;
-  navigator.clipboard.writeText(body.innerText).then(()=>showToast('Text copied to clipboard')).catch(()=>showToast('Clipboard copy failed'));
+function copyText() {
+const body = document.getElementById(‘docBody’);
+if (!body) return;
+navigator.clipboard.writeText(body.innerText)
+.then(()  => showToast(‘Text copied to clipboard’))
+.catch(()  => showToast(‘Clipboard copy failed’));
 }
 
-function esc(str){
-  return String(str).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+function esc(str) {
+return String(str).replace(/&/g,’&’).replace(/</g,’<’).replace(/>/g,’>’).replace(/”/g,’"’);
 }
 
 let toastTimer;
-function showToast(message){
-  const toast=document.getElementById('toast');
-  toast.textContent=message;
-  toast.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer=setTimeout(()=>toast.classList.remove('show'),3000);
+function showToast(message) {
+const toast = document.getElementById(‘toast’);
+toast.textContent = message;
+toast.classList.add(‘show’);
+clearTimeout(toastTimer);
+toastTimer = setTimeout(() => toast.classList.remove(‘show’), 3000);
 }
 </script>
+
 </body>
 </html>
