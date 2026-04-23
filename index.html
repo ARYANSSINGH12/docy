@@ -118,25 +118,38 @@
   main { flex: 1; overflow-y: auto; display: flex; flex-direction: column; position: relative; }
   #pageTop { position: absolute; top: 0; left: 0; }
 
+  /* ─── DROP ZONE: full when empty, mini bar when files loaded ─── */
   .drop-zone {
-    margin: 2rem;
+    margin: 2rem 2rem 0;
     border: 2px dashed var(--rule);
     border-radius: 16px;
     padding: 3rem 2rem;
     text-align: center;
     background: var(--card);
     cursor: pointer;
-    transition: border-color .2s, background .2s, transform .15s;
+    transition: border-color .2s, background .2s, transform .15s, padding .3s, margin .3s;
     position: relative;
   }
-  .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--accent-lt); transform: scale(1.005); }
+  .drop-zone:hover, .drop-zone.dragover { border-color: var(--accent); background: var(--accent-lt); }
+  .drop-zone.compact {
+    padding: .6rem 1.2rem;
+    margin: 1rem 2rem 0;
+    border-radius: 10px;
+    display: flex; align-items: center; gap: .7rem;
+    text-align: left;
+  }
+  .drop-zone.compact:hover { transform: none; }
   .drop-zone input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
-  .drop-icon { width: 60px; height: 60px; border-radius: 14px; background: var(--accent-lt); margin: 0 auto 1.2rem; display: grid; place-items: center; font-size: 1.6rem; }
-  .drop-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--ink); margin-bottom: .4rem; }
-  .drop-sub { font-size: .82rem; color: var(--ink-3); line-height: 1.6; }
+  .drop-icon { width: 60px; height: 60px; border-radius: 14px; background: var(--accent-lt); margin: 0 auto 1.2rem; display: grid; place-items: center; font-size: 1.6rem; transition: all .3s; }
+  .drop-zone.compact .drop-icon { width: 28px; height: 28px; border-radius: 6px; font-size: .9rem; margin: 0; flex-shrink: 0; }
+  .drop-title { font-family: 'DM Serif Display', serif; font-size: 1.4rem; color: var(--ink); margin-bottom: .4rem; transition: all .3s; }
+  .drop-zone.compact .drop-title { font-size: .82rem; font-family: 'DM Sans', sans-serif; font-weight: 600; margin-bottom: 0; }
+  .drop-sub { font-size: .82rem; color: var(--ink-3); line-height: 1.6; transition: all .3s; }
+  .drop-zone.compact .drop-sub { font-size: .75rem; color: var(--ink-3); }
   .drop-badge { display: inline-block; margin-top: .9rem; background: var(--ok-lt); color: var(--ok); font-size: .7rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: .25rem .7rem; border-radius: 99px; font-family: 'DM Mono', monospace; }
+  .drop-zone.compact .drop-badge { display: none; }
 
-  .viewer-wrap { flex: 1; padding: 0 2rem 2rem; display: flex; flex-direction: column; gap: 1.5rem; }
+  .viewer-wrap { flex: 1; padding: 1rem 2rem 2rem; display: flex; flex-direction: column; gap: 1.25rem; }
 
   .viewer-header {
     background: var(--card);
@@ -224,11 +237,10 @@
     border-radius: var(--radius);
     border: 1px solid var(--rule);
     box-shadow: var(--shadow);
-    padding: 2rem 2.5rem;
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
+    padding: 1.75rem 2.25rem;
   }
+  .summary-panel > div { margin-bottom: 1.75rem; }
+  .summary-panel > div:last-child { margin-bottom: 0; }
   .summary-loading {
     display: flex; flex-direction: column; align-items: center;
     padding: 3rem; gap: 1rem; color: var(--ink-3); font-size: .85rem;
@@ -447,6 +459,12 @@ async function handleFiles(files) {
       console.error(err);
     }
   }
+  // Collapse drop zone to compact bar once at least one doc is loaded
+  if (Object.keys(docs).length > 0) {
+    dropZone.classList.add('compact');
+    dropZone.querySelector('.drop-title').textContent = '+ Add more files';
+    dropZone.querySelector('.drop-sub').textContent = 'Drop or click to add another .docx';
+  }
 }
 
 function extractDocx(file) {
@@ -511,11 +529,17 @@ function removeDoc(id, e) {
   delete docs[id]; delete summaryCache[id]; delete activeTab[id];
   document.getElementById('sidebar_' + id)?.remove();
   if (activeId === id) {
+    activeId = null;
     const remaining = Object.keys(docs);
     if (remaining.length) switchDoc(remaining[0]);
-    else { activeId = null; showEmptyState(); }
+    else showEmptyState();
   }
-  if (!Object.keys(docs).length) sidebarEmpty.style.display = '';
+  if (!Object.keys(docs).length) {
+    sidebarEmpty.style.display = '';
+    dropZone.classList.remove('compact');
+    dropZone.querySelector('.drop-title').textContent = 'Drop your contracts here';
+    dropZone.querySelector('.drop-sub').innerHTML = 'Supports <strong>.docx</strong> files — even 200+ page contracts.<br/>All processing happens in your browser.';
+  }
   showToast('🗑 Document removed');
 }
 
@@ -582,11 +606,18 @@ function renderTabContent(id, tab) {
   }
 }
 
-// ─── EXTRACT PLAIN TEXT (CHUNKED FOR LARGE DOCS) ─────
+// ─── EXTRACT PLAIN TEXT ──────────────────────────────
 function getPlainText(id, maxChars = 40000) {
   const tmp = document.createElement('div');
   tmp.innerHTML = docs[id].html;
   return (tmp.textContent || '').trim().slice(0, maxChars);
+}
+
+// ─── SUMMARY RETRY HELPER (avoids inline onclick quote bugs) ─────
+function retrySmry(id) {
+  delete summaryCache[id];
+  const container = document.getElementById('tabContent_' + id);
+  if (container) renderSummaryTab(id, container);
 }
 
 // ─── SUMMARY TAB ─────────────────────────────────────
@@ -608,11 +639,6 @@ async function renderSummaryTab(id, container) {
   `;
 
   const plainText = getPlainText(id, 40000);
-
-  // FIX 1: Use system prompt to enforce JSON-only output
-  // FIX 2: max_tokens bumped to 4000 — 1000 was cutting off large responses
-  // FIX 3: Explicit paymentDetails section added to schema
-  // FIX 4: Prompt is more directive about scanning the ENTIRE document
 
   const systemPrompt = `You are a healthcare contract analyst. You MUST respond with ONLY valid JSON — no markdown fences, no explanation, no preamble. Your JSON must exactly match the schema provided. Never truncate arrays. Extract every item you find.`;
 
@@ -673,56 +699,60 @@ ${plainText}`;
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 4000,   // FIX: was 1000, far too small for complete JSON
+        max_tokens: 4000,
         system: systemPrompt,
         messages: [{ role: 'user', content: userPrompt }]
       })
     });
 
     if (!response.ok) {
-      const err = await response.json().catch(() => ({}));
-      throw new Error(err.error?.message || `API error ${response.status}`);
+      const errBody = await response.json().catch(() => ({}));
+      throw new Error(errBody.error?.message || `API error ${response.status}`);
     }
 
     const data = await response.json();
 
-    // FIX: collect all text blocks (handles tool_use responses too)
     const rawText = (data.content || [])
       .filter(b => b.type === 'text')
       .map(b => b.text || '')
       .join('');
 
-    // FIX: strip any accidental markdown fences
+    // Strip accidental markdown fences
     const clean = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```\s*$/i, '').trim();
 
     let parsed;
     try {
       parsed = JSON.parse(clean);
     } catch(e) {
-      // Try to salvage partial JSON by finding the outermost { }
       const start = clean.indexOf('{');
       const end   = clean.lastIndexOf('}');
       if (start !== -1 && end !== -1) {
         try { parsed = JSON.parse(clean.slice(start, end + 1)); }
-        catch(e2) { throw new Error('Could not parse JSON from API response. Raw: ' + clean.slice(0, 200)); }
+        catch(e2) { throw new Error('JSON parse failed. Preview: ' + clean.slice(0, 120)); }
       } else {
-        throw new Error('No JSON object found in response. Raw: ' + clean.slice(0, 200));
+        throw new Error('No JSON found in response. Preview: ' + clean.slice(0, 120));
       }
     }
 
+    // Guard: check container still exists (user may have switched away)
+    const live = document.getElementById('tabContent_' + id);
+    if (!live) return;
+
     const html = buildSummaryHTML(parsed);
     summaryCache[id] = html;
-    container.innerHTML = html;
+    live.innerHTML = html;
 
   } catch (err) {
     console.error('Summary error:', err);
-    container.innerHTML = `
+    const live = document.getElementById('tabContent_' + id);
+    if (!live) return;
+    live.innerHTML = `
       <div class="summary-panel">
         <div class="summary-loading" style="color:var(--warn)">
           <div style="font-size:2rem">⚠</div>
           <div style="font-weight:500;color:var(--ink)">Could not generate summary</div>
-          <div style="font-size:.78rem;color:var(--ink-3);max-width:400px;text-align:center;line-height:1.6">${esc(err.message)}</div>
-          <button class="btn btn-primary" style="margin-top:1rem" onclick="summaryCache['${id}']=null; renderSummaryTab('${id}', document.getElementById('tabContent_${id}'))">↺ Retry</button>
+          <div style="font-size:.78rem;color:var(--ink-3);max-width:420px;text-align:center;line-height:1.6">${esc(err.message)}</div>
+          <button class="btn btn-primary" style="margin-top:1rem" onclick="retrySmry('${id}')">↺ Retry</button>
         </div>
       </div>`;
   }
